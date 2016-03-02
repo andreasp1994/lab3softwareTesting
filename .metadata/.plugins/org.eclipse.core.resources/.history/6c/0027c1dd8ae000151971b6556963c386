@@ -1,0 +1,55 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.SellOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.TickEvent;
+import uk.ac.glasgow.jagora.Trade;
+import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.impl.LimitSellOrder;
+import uk.ac.glasgow.jagora.test.stub.StubStock;
+import uk.ac.glasgow.jagora.test.stub.StubTrader;
+
+public class LimitSellOrderTest {
+
+	protected SellOrder sellOrder;
+	SellOrder testAgainstSellOrder;
+	
+	TickEvent<Trade> tickEvent;
+	protected Stock stock = StubStock.lemons;
+	private Trade goodTrade;
+	private Trade badTrade;
+	protected Trader trader = new StubTrader();
+	
+	@Before
+	public void setUp() {
+		sellOrder = new LimitSellOrder(trader, stock, 10, 5.00);
+	}
+	
+	@Test
+	public void testEquals() {
+		testAgainstSellOrder = new LimitSellOrder(trader, stock, 10, 5.0);
+		assertTrue("BuyOrder prices should return 0.", sellOrder.compareTo(testAgainstSellOrder) == 0);
+	}
+	
+	@Test
+	public void testSellOrderLarger() {
+		testAgainstSellOrder = new LimitSellOrder(trader, stock, 10, 6.0);
+		assertTrue("Comparison should return negative number", sellOrder.compareTo(testAgainstSellOrder) < 0);
+	}
+	
+	@Test
+	public void testSellOrderSmaller() {
+		testAgainstSellOrder = new LimitSellOrder(trader, stock, 10, 4.0);
+		assertTrue("Comparison should return positive number", sellOrder.compareTo(testAgainstSellOrder) > 0);
+	}
+	
+	@Test
+	public void testGetTrader() {
+		assertTrue("Trader is not the same as the one specified.", sellOrder.getTrader().equals(trader));	
+	}
+}

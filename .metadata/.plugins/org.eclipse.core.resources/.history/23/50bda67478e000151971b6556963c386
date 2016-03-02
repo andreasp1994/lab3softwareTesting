@@ -1,0 +1,110 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.assertTrue;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.BuyOrder;
+import uk.ac.glasgow.jagora.OrderBook;
+import uk.ac.glasgow.jagora.SellOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.World;
+import uk.ac.glasgow.jagora.impl.DefaultOrderBook;
+import uk.ac.glasgow.jagora.test.stub.StubBuyOrder;
+import uk.ac.glasgow.jagora.test.stub.StubSellOrder;
+import uk.ac.glasgow.jagora.test.stub.StubStock;
+import uk.ac.glasgow.jagora.test.stub.StubTickEvent;
+import uk.ac.glasgow.jagora.test.stub.StubWorld;
+
+public class DefaultOrderBookTest {
+
+	
+	protected World world = StubWorld.world;
+	protected Stock stock = StubStock.lemons;
+	
+	protected StubBuyOrder highBuyOrder = new StubBuyOrder(null, stock, 10, 9.50);
+	protected StubSellOrder highSellOrder = new StubSellOrder(null, stock, 10, 10.00);
+	
+	protected StubBuyOrder lowBuyOrder = new StubBuyOrder(null, stock, 10, 5.00);
+	protected StubSellOrder lowSellOrder = new StubSellOrder(null, stock, 10, 5.50);
+	
+	protected OrderBook<SellOrder> sellOrderBook;
+	protected OrderBook<BuyOrder> buyOrderBook;
+	
+	@Before
+	public void setUp(){
+		sellOrderBook = new DefaultOrderBook<SellOrder>(world);
+		buyOrderBook = new DefaultOrderBook<BuyOrder>(world);
+	}
+	
+	@After
+	public void tearDown(){
+		
+	}
+
+	@Test
+	public void testEmptyBook(){
+		assertTrue("Empty sell book does not return null", sellOrderBook.getBestOrder() == null);
+		assertTrue("Empty buy book does not return null", buyOrderBook.getBestOrder() == null);
+	}
+	
+	@Test
+	public void testOrderBooksRecording(){
+		sellOrderBook.recordOrder(highSellOrder);
+		buyOrderBook.recordOrder(highBuyOrder);
+		
+		assertTrue("Sell order book does not save orders correctly", sellOrderBook.getBestOrder().compareTo(highSellOrder) == 0);
+		assertTrue("Buy order book does not save orders correctly", buyOrderBook.getBestOrder().compareTo(highBuyOrder) == 0);
+	}
+	
+	@Test
+	public void testOrderBooksCancelling(){
+		sellOrderBook.recordOrder(highSellOrder);
+		buyOrderBook.recordOrder(highBuyOrder);
+		
+		sellOrderBook.cancelOrder(highSellOrder);
+		buyOrderBook.cancelOrder(highBuyOrder);
+		
+		assertTrue("Cannot cancel sell order", sellOrderBook.getBestOrder() == null);
+		assertTrue("Cannot cancel buy order", buyOrderBook.getBestOrder() == null);
+	}
+
+
+	@Test
+	public void testBestSellOrder(){
+		sellOrderBook.recordOrder(highSellOrder);
+		sellOrderBook.recordOrder(lowSellOrder);
+		
+		assertTrue("Does not return best sell order", sellOrderBook.getBestOrder() == lowSellOrder);
+	}
+	
+	@Test
+	public void testBestBuyOrder(){
+		buyOrderBook.recordOrder(highBuyOrder);
+		buyOrderBook.recordOrder(lowBuyOrder);
+		
+		assertTrue("Does not return best buy order", buyOrderBook.getBestOrder() == highBuyOrder);
+	}
+	
+	@Test
+	public void testOrdersAsList(){
+		assertTrue("Empty sell order book should return empty list", sellOrderBook.getOrdersAsList().isEmpty());
+		assertTrue("Empty buy order book should return empty list", buyOrderBook.getOrdersAsList().isEmpty());
+		
+		sellOrderBook.recordOrder(highSellOrder);
+		buyOrderBook.recordOrder(highBuyOrder);
+		
+		assertTrue("Sell order list incorrect", sellOrderBook.getOrdersAsList().get(0).compareTo(new StubTickEvent<SellOrder>(highSellOrder)) == 0);
+		assertTrue("Buy order list incorrect", buyOrderBook.getOrdersAsList().get(0).compareTo(new StubTickEvent<BuyOrder>(highBuyOrder)) == 0);
+		
+		sellOrderBook.recordOrder(lowSellOrder);
+		buyOrderBook.recordOrder(lowBuyOrder);
+		
+		assertTrue("Sell order list incorrect", sellOrderBook.getOrdersAsList().get(1).compareTo(new StubTickEvent<SellOrder>(lowSellOrder)) == 0);
+		assertTrue("Buy order list incorrect", buyOrderBook.getOrdersAsList().get(1).compareTo(new StubTickEvent<BuyOrder>(lowBuyOrder)) == 0);
+		
+	}
+
+}

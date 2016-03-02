@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="org.junit.Before"/>
+<fullyQualifiedTypeName name="uk.ac.glasgow.jagora.BuyOrder"/>
+<fullyQualifiedTypeName name="uk.ac.glasgow.jagora.impl.LimitBuyOrder"/>
+<fullyQualifiedTypeName name="uk.ac.glasgow.jagora.Trader"/>
+<fullyQualifiedTypeName name="org.junit.Test"/>
+<fullyQualifiedTypeName name="uk.ac.glasgow.jagora.impl.DefaultWorld"/>
+<fullyQualifiedTypeName name="uk.ac.glasgow.jagora.impl.LimitSellOrder"/>
+<fullyQualifiedTypeName name="uk.ac.glasgow.jagora.SellOrder"/>
+<fullyQualifiedTypeName name="uk.ac.glasgow.jagora.Trade"/>
+<fullyQualifiedTypeName name="uk.ac.glasgow.jagora.TickEvent"/>
+<fullyQualifiedTypeName name="uk.ac.glasgow.jagora.impl.DefaultTickEvent"/>
+<fullyQualifiedTypeName name="uk.ac.glasgow.jagora.World"/>
+</qualifiedTypeNameHistroy>

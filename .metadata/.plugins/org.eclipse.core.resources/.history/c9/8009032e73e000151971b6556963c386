@@ -1,0 +1,69 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static uk.ac.glasgow.jagora.test.stub.StubStock.lemons;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.BuyOrder;
+import uk.ac.glasgow.jagora.Market;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.World;
+import uk.ac.glasgow.jagora.impl.ContinuousOrderDrivenMarket;
+import uk.ac.glasgow.jagora.test.stub.StubBuyOrder;
+import uk.ac.glasgow.jagora.test.stub.StubTrader;
+import uk.ac.glasgow.jagora.test.stub.StubWorld;
+
+public class ContinuousOrderDriverMarketTest {
+
+	protected Stock stock = lemons;
+	protected World stubWorld = new StubWorld();
+	
+	protected Market market;
+	
+	protected BuyOrder buyOrder;
+	protected Trader trader = StubTrader.alice;
+	
+	
+	@Before
+	public void setUp() throws Exception {
+		market = new ContinuousOrderDrivenMarket(lemons, stubWorld);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		
+	}
+
+	@Test
+	public void testGetStock() {
+		assertTrue("Stock of the market is not correct.", market.getStock() == lemons);
+	}
+	
+	@Test
+	public void testGetBestBid() {
+		buyOrder = new StubBuyOrder(trader, lemons, 3, 9.0);
+		market.placeBuyOrder(buyOrder);
+		buyOrder = new StubBuyOrder(trader, lemons, 4, 16.0);
+		BuyOrder bestBid = buyOrder;
+		market.placeBuyOrder(buyOrder);
+		buyOrder = new StubBuyOrder(trader, lemons, 10, 12.0);
+		market.placeBuyOrder(buyOrder);
+		assertTrue("Best bid incorrect", bestBid.getPrice() == market.getBestBid());
+	}
+	
+	@Test
+	public void testGetBestBidNull() {
+		assertTrue("Best bid should return null", market.getBestBid() == null);
+	}
+	
+	@Test
+	public void test() {
+		fail("Not yet implemented");
+	}
+
+}

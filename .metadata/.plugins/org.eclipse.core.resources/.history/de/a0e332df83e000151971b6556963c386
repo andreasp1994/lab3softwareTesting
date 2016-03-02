@@ -1,0 +1,44 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.fail;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.BuyOrder;
+import uk.ac.glasgow.jagora.SellOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.Trade;
+import uk.ac.glasgow.jagora.World;
+import uk.ac.glasgow.jagora.impl.DefaultTrade;
+import uk.ac.glasgow.jagora.test.stub.StubBuyOrder;
+import uk.ac.glasgow.jagora.test.stub.StubSellOrder;
+import uk.ac.glasgow.jagora.test.stub.StubStock;
+import uk.ac.glasgow.jagora.test.stub.StubWorld;
+
+public class DefaultTradeTest {
+
+	protected Trade trade;
+	protected World world = StubWorld.world;
+	
+	protected BuyOrder buyOrder = new StubBuyOrder(null, StubStock.lemons, 10, 9.99);
+	protected SellOrder sellOrder = new StubSellOrder(null, StubStock.lemons, 12, 8.23);
+	
+	protected Stock stock = StubStock.lemons;
+	
+	@Before
+	public void setUp() throws Exception {
+		trade = new DefaultTrade(world, buyOrder, sellOrder, stock, 10, 5);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+	}
+
+	@Test
+	public void test() {
+		fail("Not yet implemented");
+	}
+
+}

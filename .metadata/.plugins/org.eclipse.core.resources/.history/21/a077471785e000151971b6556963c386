@@ -1,0 +1,64 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.*;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.BuyOrder;
+import uk.ac.glasgow.jagora.SellOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.Trade;
+import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.World;
+import uk.ac.glasgow.jagora.impl.DefaultTickEvent;
+import uk.ac.glasgow.jagora.impl.DefaultTrade;
+import uk.ac.glasgow.jagora.test.stub.StubBuyOrder;
+import uk.ac.glasgow.jagora.test.stub.StubSellOrder;
+import uk.ac.glasgow.jagora.test.stub.StubStock;
+import uk.ac.glasgow.jagora.test.stub.StubTrader;
+import uk.ac.glasgow.jagora.test.stub.StubWorld;
+
+public class DefaultTradeTest {
+
+	protected Trade trade;
+	protected World world = StubWorld.world;
+	
+	protected Trader trader = StubTrader.alice;
+	
+	protected BuyOrder buyOrder = new StubBuyOrder(trader, StubStock.lemons, 10, 9.99);
+	protected SellOrder sellOrder = new StubSellOrder(trader, StubStock.lemons, 12, 8.20);
+	
+	protected Stock stock = StubStock.lemons;
+	
+	@Before
+	public void setUp() throws Exception {
+		trade = new DefaultTrade(world, buyOrder, sellOrder, stock, 2, 8.20);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+	}
+
+	@Test
+	public void testGetStock(){
+		assertTrue("Trade does not return corrent stock", trade.getStock().getName().equals("lemons"));
+	}
+	
+	@Test
+	public void testGetQuantity(){
+		assertTrue("Trade does not return quantity correctly", trade.getQuantity() == 2);
+	}
+	
+	@Test
+	public void testGetPrice(){
+		assertTrue("Trade does not return price correcty", trade.getPrice() == 8.20);
+	}
+
+	@Test
+	public void testExecute() throws Exception{
+		assertTrue("Trade does not return correct tick event", trade.execute().equals(world.createTickEvent(trade)));
+		assertFalse("trade's returned Tick event which is not unique", trade.execute().equals(new DefaultTickEvent<Trade>(trade, 50l)));
+	}
+}

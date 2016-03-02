@@ -1,0 +1,15 @@
+package uk.ac.glasgow.jagora.test;
+
+import org.junit.Before;
+
+import uk.ac.glasgow.jagora.BuyOrder;
+
+public class DefaultBuyOrderTest {
+
+	protected BuyOrder buyorder;
+	
+	@Before
+	public void setUp() throws Exception{
+		this.buyorder = new DefaultB
+	}
+}

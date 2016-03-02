@@ -1,0 +1,5 @@
+package uk.ac.glasgow.jagora.test.stub;
+
+public class StubTickEvent {
+
+}

@@ -1,0 +1,75 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.assertEquals;
+import static uk.ac.glasgow.jagora.test.stub.StubStock.lemons;
+import static uk.ac.glasgow.jagora.test.stub.StubTrader.alice;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.BuyOrder;
+import uk.ac.glasgow.jagora.SellOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.TickEvent;
+import uk.ac.glasgow.jagora.Trade;
+import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.World;
+import uk.ac.glasgow.jagora.impl.DefaultTickEvent;
+import uk.ac.glasgow.jagora.impl.DefaultTrade;
+import uk.ac.glasgow.jagora.impl.DefaultTrader;
+import uk.ac.glasgow.jagora.impl.DefaultWorld;
+import uk.ac.glasgow.jagora.impl.LimitBuyOrder;
+import uk.ac.glasgow.jagora.impl.LimitSellOrder;
+
+public class DefaultOrderTest {
+
+	protected Trader trader = new DefaultTrader("Bob",600.00,lemons,10);
+	protected Stock stock = lemons;
+	protected Integer quantity = 100;
+	protected Double price= 10.0;
+
+	protected BuyOrder buyOrder;
+	
+	
+	@Before
+	public void setUp() throws Exception{
+		this.buyOrder = new LimitBuyOrder(trader, stock, quantity, price);
+		
+	}
+	
+	@Test
+	public void testGetTrader(){
+		assertEquals(trader, buyOrder.getTrader() );
+	}
+	
+	@Test
+	public void testGetStock(){
+		assertEquals(stock, buyOrder.getStock());
+	}
+	
+	@Test
+	public void testGetPrice(){
+		assertEquals(price,buyOrder.getPrice());
+	}
+	
+	@Test
+	public void testGetRemainingQuantity(){
+		assertEquals(quantity, buyOrder.getRemainingQuantity());
+	}
+	
+	@Test
+	public void TestSatisfyTradeSatisfied(){
+		int initialQuantity = quantity;
+		World world = new DefaultWorld();
+		SellOrder sellOrder = new LimitSellOrder(alice, lemons, 10, 9.0);
+		Trade trade = new DefaultTrade(world, buyOrder, sellOrder,stock,10,9.0);
+		this.buyOrder.satisfyTrade(new DefaultTickEvent<Trade>(trade, System.currentTimeMillis()));
+		assertEquals(buyOrder.getRemainingQuantity(), 90);
+	}
+	
+	
+	@Test
+	public void testCompare() {
+		
+	}
+}

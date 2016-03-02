@@ -1,0 +1,62 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.*;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.BuyOrder;
+import uk.ac.glasgow.jagora.OrderBook;
+import uk.ac.glasgow.jagora.SellOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.World;
+import uk.ac.glasgow.jagora.impl.DefaultOrderBook;
+import uk.ac.glasgow.jagora.test.stub.StubBuyOrder;
+import uk.ac.glasgow.jagora.test.stub.StubSellOrder;
+import uk.ac.glasgow.jagora.test.stub.StubStock;
+import uk.ac.glasgow.jagora.test.stub.StubWorld;
+
+public class DefaultOrderBookTest {
+
+	
+	protected World world = StubWorld.world;
+	protected Stock stock = StubStock.lemons;
+	
+	protected StubBuyOrder stBuyOrder = new StubBuyOrder(null, stock, 10, 7.50);
+	protected StubSellOrder stSellOrder = new StubSellOrder(null, stock, 10, 8.00);
+	
+	protected StubBuyOrder smallBuyOrder = new StubBuyOrder(null, stock, 10, 5.00);
+	protected StubSellOrder smallSellOrder = new StubSellOrder(null, stock, 10, 6.50);
+	
+	protected OrderBook<SellOrder> sellOrderBook;
+	protected OrderBook<BuyOrder> buyOrderBook;
+	
+	@Before
+	public void setUp(){
+		sellOrderBook = new DefaultOrderBook<SellOrder>(world);
+		buyOrderBook = new DefaultOrderBook<BuyOrder>(world);
+	}
+	
+	@After
+	public void tearDown(){
+		
+	}
+
+	@Test
+	public void testEmptyBook(){
+		assertTrue("Empty sell book does not return null", sellOrderBook.getBestOrder() == null);
+		assertTrue("Empty buy book does not return null", buyOrderBook.getBestOrder() == null);
+	}
+	
+	@Test
+	public void testOrderBooksRecording(){
+		sellOrderBook.recordOrder(stSellOrder);
+		buyOrderBook.recordOrder(stBuyOrder);
+		
+		assertTrue("Sell order book does not save orders correctly", sellOrderBook.getBestOrder().compareTo(stSellOrder) == 0);
+		assertTrue("Buy order book does not save orders correctly", buyOrderBook.getBestOrder().compareTo(stBuyOrder) == 0);
+	}
+	
+
+}

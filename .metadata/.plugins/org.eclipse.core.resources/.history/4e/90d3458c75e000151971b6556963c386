@@ -1,0 +1,161 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.assertTrue;
+import static uk.ac.glasgow.jagora.test.stub.StubStock.lemons;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.BuyOrder;
+import uk.ac.glasgow.jagora.Market;
+import uk.ac.glasgow.jagora.SellOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.TickEvent;
+import uk.ac.glasgow.jagora.Trade;
+import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.World;
+import uk.ac.glasgow.jagora.impl.ContinuousOrderDrivenMarket;
+import uk.ac.glasgow.jagora.test.stub.StubBuyOrder;
+import uk.ac.glasgow.jagora.test.stub.StubSellOrder;
+import uk.ac.glasgow.jagora.test.stub.StubTrader;
+import uk.ac.glasgow.jagora.test.stub.StubWorld;
+
+public class ContinuousOrderDriverMarketTest {
+
+	protected Stock stock = lemons;
+	protected World stubWorld = new StubWorld();
+	
+	protected Market market;
+	
+	protected BuyOrder buyOrder;
+	protected SellOrder sellOrder;
+	protected Trader trader = StubTrader.alice;
+	
+	
+	@Before
+	public void setUp() throws Exception {
+		market = new ContinuousOrderDrivenMarket(lemons, stubWorld);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		
+	}
+
+	@Test
+	public void testGetStock() {
+		assertTrue("Stock of the market is not correct.", market.getStock() == lemons);
+	}
+	
+	@Test
+	public void testGetBestBid() {
+		buyOrder = new StubBuyOrder(trader, lemons, 4, 8.0);
+		market.placeBuyOrder(buyOrder);
+		
+		buyOrder = new StubBuyOrder(trader, lemons, 4, 15.0);
+		market.placeBuyOrder(buyOrder);
+		
+		BuyOrder bestBid = buyOrder;
+		
+		buyOrder = new StubBuyOrder(trader, lemons, 10, 11.0);
+		market.placeBuyOrder(buyOrder);
+		
+		assertTrue("Best bid incorrect", bestBid.getPrice() == market.getBestBid());
+	}
+	
+	
+	@Test
+	public void testGetBestBidNull() {
+		assertTrue("Best bid should return null", market.getBestBid() == null);
+	}
+	
+	@Test
+	public void testGetBestOffer() {
+		sellOrder = new StubSellOrder(trader, lemons, 6, 2.0);
+		market.placeSellOrder(sellOrder);
+		
+		SellOrder bestOffer = sellOrder;
+		
+		sellOrder = new StubSellOrder(trader, lemons, 8, 13.0);
+		market.placeSellOrder(sellOrder);
+		
+		sellOrder = new StubSellOrder(trader, lemons, 8, 15.0);
+		market.placeSellOrder(sellOrder);
+		
+		assertTrue("Best offer is incorrect", bestOffer.getPrice() == market.getBestBid());
+	}
+	
+	@Test
+	public void testGetBestOfferNull() {
+		assertTrue("Best offer should have been null", market.getBestOffer() == null);
+	}
+	
+	@Test
+	public void testPlaceBuyOrder() {
+		assertTrue("Buy order book should be empty initialy", market.getBestBid() == null);
+		buyOrder = new StubBuyOrder(trader, lemons, 4, 20.0);
+		market.placeBuyOrder(buyOrder);
+		assertTrue("Buy order was not placed inside the buy order order book", market.getBestBid() == buyOrder.getPrice());
+	}
+	
+	@Test
+	public void testPlaceSellOrder() {
+		assertTrue("Sell order book should be empty initialy", market.getBestOffer() == null);
+		sellOrder = new StubSellOrder(trader, lemons, 2, 15.0);
+		market.placeSellOrder(sellOrder);
+		assertTrue("Sell order wasnt placed inside the sell order book.", market.getBestOffer() == sellOrder.getPrice());
+	}
+	
+	@Test
+	public void testCancelBuyOrder() {
+		assertTrue("Buy order book should be empty at this point", market.getBestBid() == null);
+		buyOrder = new StubBuyOrder(trader, lemons, 10, 20.0);
+		market.placeBuyOrder(buyOrder);
+		assertTrue("Buy order was not placed inside the buy order book", market.getBestBid() == buyOrder.getPrice());
+		market.cancelBuyOrder(buyOrder);
+		assertTrue("Buy order is still in order after removal", market.getBestBid() == null);
+	}
+	
+	@Test 
+	public void testCancelSellOrder() {
+		assertTrue("Sell order book should be empty at this point", market.getBestOffer() == null);
+		sellOrder = new StubSellOrder(trader, lemons, 20, 15.0);
+		market.placeSellOrder(sellOrder);
+		assertTrue("Sell order was not placed inside the sell order book", market.getBestOffer() == sellOrder.getPrice());
+		market.cancelSellOrder(sellOrder);
+		assertTrue("Sell order is still in order book after removal.", market.getBestOffer() == null);
+	}
+	
+	@Test
+	public void testClearingPossibleTradesExist() {
+		assertTrue("Buy order book should be empty at this point", market.getBestBid() == null);
+		assertTrue("Sell order book should be empty at this point", market.getBestOffer() == null);
+		
+		buyOrder = new StubBuyOrder(StubTrader.buyer, lemons, 3, 5.35);
+		market.placeBuyOrder(buyOrder);
+		buyOrder = new StubBuyOrder(StubTrader.buyer, lemons, 5, 6.0);
+		market.placeBuyOrder(buyOrder);
+
+		
+		sellOrder = new StubSellOrder(StubTrader.seller, lemons, 3, 4.0);
+		market.placeSellOrder(sellOrder);
+		sellOrder = new StubSellOrder(StubTrader.seller, lemons, 3, 5.0);
+		market.placeSellOrder(sellOrder);
+		sellOrder = new StubSellOrder(StubTrader.seller, lemons, 4, 9.0);
+		market.placeSellOrder(sellOrder);
+		
+		List<TickEvent<Trade>> returnResult = market.doClearing();
+		List<TickEvent<Trade>> expectedResult = Arrays.asList(
+				new StubTickEvent<Trade>(new StubTrade(3, 12.0, lemons), 0L),
+				new StubTickEvent<Trade>(new StubTrade(2, 10.0, lemons), 0L),
+				new StubTickEvent<Trade>(new StubTrade(1, 5.35, lemons), 0L));
+		
+		assertTrue("Returned tick events are incorrect", returnResult.equals(expectedResult)); 
+		
+	}
+	
+}

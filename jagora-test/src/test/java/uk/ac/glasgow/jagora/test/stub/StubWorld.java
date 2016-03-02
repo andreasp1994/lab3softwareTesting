@@ -1,0 +1,18 @@
+package uk.ac.glasgow.jagora.test.stub;
+
+import uk.ac.glasgow.jagora.TickEvent;
+import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.World;
+import uk.ac.glasgow.jagora.impl.DefaultTickEvent;
+
+public class StubWorld implements World{
+
+	public static final World world = new StubWorld();
+	
+	@Override
+	public <T> TickEvent<T> createTickEvent(T event) {
+		// TODO Auto-generated method stub
+		return new DefaultTickEvent<T>(event, 30l);
+	}
+
+}

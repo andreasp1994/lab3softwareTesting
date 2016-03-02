@@ -1,0 +1,144 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.SellOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.TickEvent;
+import uk.ac.glasgow.jagora.Trade;
+import uk.ac.glasgow.jagora.TradeException;
+import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.impl.LimitSellOrder;
+import uk.ac.glasgow.jagora.test.stub.StubStock;
+import uk.ac.glasgow.jagora.test.stub.StubTickEvent;
+import uk.ac.glasgow.jagora.test.stub.StubTrade;
+import uk.ac.glasgow.jagora.test.stub.StubTrader;
+
+public class LimitSellOrderTest {
+
+	protected SellOrder sellOrder;
+	protected SellOrder testAgainstSellOrder;
+	protected TickEvent<Trade> tickEvent;
+	protected Stock stock = StubStock.lemons;
+	protected Trade goodTrade;
+	protected Trade badTrade;
+	
+	protected Trader trader = new StubTrader();
+	
+	@Before
+	public void setUp() {
+		sellOrder = new LimitSellOrder(trader, stock, 10, 5.00);
+	}
+	
+	@Test
+	public void testEquals() {
+		testAgainstSellOrder = new LimitSellOrder(trader, stock, 10, 5.0);
+		assertTrue("BuyOrder prices should return 0.", sellOrder.compareTo(testAgainstSellOrder) == 0);
+	}
+	
+	@Test
+	public void testSellOrderLarger() {
+		testAgainstSellOrder = new LimitSellOrder(trader, stock, 10, 6.0);
+		assertTrue("Comparison should return negative number", sellOrder.compareTo(testAgainstSellOrder) < 0);
+	}
+	
+	@Test
+	public void testSellOrderSmaller() {
+		testAgainstSellOrder = new LimitSellOrder(trader, stock, 10, 4.0);
+		assertTrue("Comparison should return positive number", sellOrder.compareTo(testAgainstSellOrder) > 0);
+	}
+	
+	@Test
+	public void testGetTrader() {
+		assertTrue("Trader is not the same as the one specified.", sellOrder.getTrader().equals(trader));	
+	}
+	
+	@Test
+	public void testGetStock() {
+		assertTrue("Stock is not the same as the one specified", sellOrder.getStock().equals(StubStock.lemons));
+	}
+	
+	@Test
+	public void testRemainingQuantity() {
+		assertTrue("Remaining quantity is incorrect", sellOrder.getRemainingQuantity() == 10);
+	}
+	
+	@Test
+	public void testPrice() {
+		assertTrue("Stock price is incorrect", sellOrder.getPrice() == 5.00);
+	}
+	
+	@Test
+	public void testSatisfyTrade() throws Exception {
+		Double oldCash = trader.getCash();
+		Integer oldLemons = trader.getInventoryHolding(StubStock.lemons);
+		
+		goodTrade = new StubTrade(3, 5.0, stock);
+		tickEvent = new StubTickEvent<Trade>(goodTrade, 0L);
+		sellOrder.satisfyTrade(tickEvent);
+		
+		assertTrue("Trader's cash was not reduced", trader.getCash() == oldCash + tickEvent.getEvent().getPrice());
+		assertTrue("Trader's items of this stock type were not increased.", 
+				oldLemons == trader.getInventoryHolding(stock) - tickEvent.getEvent().getQuantity());
+	}
+	
+	@Test(expected=TradeException.class)
+	public void testBadSatisfyTradeQuantityNegative() throws Exception {
+		badTrade = new StubTrade(-1, 5.0, stock);
+		tickEvent = new StubTickEvent<Trade>(badTrade, 0L);
+		sellOrder.satisfyTrade(tickEvent);
+	}
+	
+	@Test(expected=TradeException.class)
+	public void testBadSatisfyTradeQuantityZero() throws Exception {
+		badTrade = new StubTrade(0, 5.0, stock);
+		tickEvent = new StubTickEvent<Trade>(badTrade, 0L);
+		sellOrder.satisfyTrade(tickEvent);
+	}
+	
+	@Test(expected=TradeException.class)
+	public void testBadSatisfyTradeCost() throws Exception{
+		badTrade = new StubTrade(1, -5.0, stock);
+		tickEvent = new StubTickEvent<Trade>(badTrade, 0L);
+		sellOrder.satisfyTrade(tickEvent);
+	}
+	
+	@Test
+	public void testRollBackTrade() throws Exception {
+		Double initialCash = trader.getCash();
+		Integer initialInventory = trader.getInventoryHolding(stock);
+		
+		goodTrade = new StubTrade(3, 5.0, stock);
+		tickEvent = new StubTickEvent<Trade>(goodTrade, 0L);
+		sellOrder.satisfyTrade(tickEvent);
+		sellOrder.rollBackTrade(tickEvent);
+		
+		assertTrue("Trader's cash was not properly restored", initialCash  == trader.getCash());
+		assertTrue("Trader's inventory was not restored",
+				initialInventory == trader.getInventoryHolding(stock));
+	}
+	
+	@Test(expected=TradeException.class)
+	public void testBadRollbackTradeQuantityNegative() throws Exception {
+		badTrade = new StubTrade(-1, 5.0, stock);
+		tickEvent = new StubTickEvent<Trade>(badTrade, 0L);
+		sellOrder.rollBackTrade(tickEvent);
+	}
+	
+	@Test(expected=TradeException.class)
+	public void testBadRollbackTradeQuantityZero() throws Exception {
+		badTrade = new StubTrade(0, 5.0, stock);
+		tickEvent = new StubTickEvent<Trade>(goodTrade, 0L);
+		sellOrder.rollBackTrade(tickEvent);
+	}
+	
+	@Test(expected=TradeException.class)
+	public void testBadRollbackTradeCost() throws Exception{
+		badTrade = new StubTrade(1, -5.0, stock);
+		tickEvent = new StubTickEvent<Trade>(badTrade, 0L);
+		sellOrder.rollBackTrade(tickEvent);
+	}
+}

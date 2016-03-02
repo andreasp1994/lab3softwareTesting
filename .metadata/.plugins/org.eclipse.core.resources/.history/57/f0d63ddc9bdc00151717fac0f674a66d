@@ -1,0 +1,53 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.*;
+import static uk.ac.glasgow.jagora.test.stub.StubStock.lemons;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.BuyOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.impl.DefaultTrader;
+import uk.ac.glasgow.jagora.impl.LimitBuyOrder;
+
+public class DefaultBuyOrderTest {
+
+	protected Trader trader = new DefaultTrader("Alice",600.00,lemons,10);
+	protected Stock stock = lemons;
+	protected Integer quantity = 100;
+	protected Double price= 20.5;
+
+	protected BuyOrder buyorder;
+	
+	@Before
+	public void setUp() throws Exception{
+		this.buyorder = new LimitBuyOrder(trader, stock, quantity, price);
+	}
+	
+	@Test
+	public void testGetTrader(){
+		assertEquals(trader, buyorder.getTrader() );
+	}
+	
+	@Test
+	public void testGetStock(){
+		assertEquals(stock, buyorder.getStock());
+	}
+	
+	@Test
+	public void testGetPrice(){
+		assertEquals(price,buyorder.getPrice());
+	}
+	
+	@Test
+	public void testGetRemainingQuantity(){
+		assertEquals()
+	}
+	
+	@Test
+	public void testCompare() {
+		
+	}
+}

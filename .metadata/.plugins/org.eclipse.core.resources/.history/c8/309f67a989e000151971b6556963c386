@@ -1,0 +1,32 @@
+package uk.ac.glasgow.jagora.test;
+
+import org.junit.Before;
+
+import uk.ac.glasgow.jagora.SellOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.TickEvent;
+import uk.ac.glasgow.jagora.Trade;
+import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.impl.LimitSellOrder;
+import uk.ac.glasgow.jagora.test.stub.StubStock;
+
+public class LimitSellOrderTest {
+
+	SellOrder thisSellOrder;
+	SellOrder testAgainstSellOrder;
+	Trader trader;
+	
+	TickEvent<Trade> tickEvent;
+	private Stock stock = StubStock.lemons;
+	private Trade goodTrade;
+	private Trade badTrade;
+	private Integer quantity = 10;
+	private Double thisPrice = 5.0;
+	protected Trader trader = new StubTrader();
+	
+	@Before
+	public void setUp() {
+		thisSellOrder = new LimitSellOrder(trader, stock, quantity, thisPrice);
+	}
+	
+}

@@ -1,0 +1,65 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.assertEquals;
+import static uk.ac.glasgow.jagora.test.stub.StubStock.lemons;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.BuyOrder;
+import uk.ac.glasgow.jagora.SellOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.Trade;
+import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.impl.DefaultTrader;
+import uk.ac.glasgow.jagora.impl.DefaultWorld;
+import uk.ac.glasgow.jagora.impl.LimitBuyOrder;
+import uk.ac.glasgow.jagora.impl.LimitSellOrder;
+
+public class DefaultBuyOrderTest {
+
+	protected Trader trader = new DefaultTrader("Alice",600.00,lemons,10);
+	protected Stock stock = lemons;
+	protected Integer quantity = 100;
+	protected Double price= 10;
+
+	protected BuyOrder buyOrder;
+	
+	
+	@Before
+	public void setUp() throws Exception{
+		this.buyOrder = new LimitBuyOrder(trader, stock, quantity, price);
+		
+	}
+	
+	@Test
+	public void testGetTrader(){
+		assertEquals(trader, buyOrder.getTrader() );
+	}
+	
+	@Test
+	public void testGetStock(){
+		assertEquals(stock, buyOrder.getStock());
+	}
+	
+	@Test
+	public void testGetPrice(){
+		assertEquals(price,buyOrder.getPrice());
+	}
+	
+	@Test
+	public void testGetRemainingQuantity(){
+		assertEquals(quantity, buyOrder.getRemainingQuantity());
+	}
+	
+	@Test
+	public void TestSatisfyTradeSatisfied(){
+		
+	}
+	
+	
+	@Test
+	public void testCompare() {
+		
+	}
+}

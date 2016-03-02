@@ -1,0 +1,31 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.*;
+import static uk.ac.glasgow.jagora.test.stub.StubStock.lemons;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.Stock;
+
+public class ContinuousOrderDriverMarketTest {
+
+	protected Stock stock = lemons;
+	World stubWorld = new StubWorld();
+	
+	@Before
+	public void setUp() throws Exception {
+		market = new ContinuousOrderDrivenMarket(lemons, stubWorld);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+	}
+
+	@Test
+	public void test() {
+		fail("Not yet implemented");
+	}
+
+}

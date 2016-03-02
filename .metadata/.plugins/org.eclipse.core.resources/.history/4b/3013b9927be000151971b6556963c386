@@ -1,0 +1,34 @@
+package uk.ac.glasgow.jagora.test;
+
+import static org.junit.Assert.fail;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import uk.ac.glasgow.jagora.TickEvent;
+import uk.ac.glasgow.jagora.Trade;
+import uk.ac.glasgow.jagora.test.stub.StubStock;
+import uk.ac.glasgow.jagora.test.stub.StubTrade;
+
+public class DefaultTickEventTest {
+
+	protected TickEvent<Trade> tEvent;
+	protected TickEvent<Trade> earlyTEvent;
+	protected TickEvent<Trade> lateTEvent;
+	protected Trade trade = new StubTrade(10, 5, StubStock.lemons);
+	
+	@Before
+	public void setUp() throws Exception {
+	}
+
+	@After
+	public void tearDown() throws Exception {
+	}
+
+	@Test
+	public void test() {
+		fail("Not yet implemented");
+	}
+
+}

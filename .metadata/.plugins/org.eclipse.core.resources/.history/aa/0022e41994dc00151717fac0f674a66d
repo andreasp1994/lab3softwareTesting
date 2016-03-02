@@ -1,0 +1,24 @@
+package uk.ac.glasgow.jagora.test;
+
+import org.junit.Before;
+
+import uk.ac.glasgow.jagora.BuyOrder;
+import uk.ac.glasgow.jagora.Stock;
+import uk.ac.glasgow.jagora.Trader;
+import uk.ac.glasgow.jagora.impl.LimitBuyOrder;
+import static uk.ac.glasgow.jagora.test.stub.StubStock.lemons;
+
+public class DefaultBuyOrderTest {
+
+	protected Trader trader;
+	protected Stock stock = lemons;
+	protected Integer quantity = 100;
+	protected Double price= 20.5;
+
+	protected BuyOrder buyorder;
+	
+	@Before
+	public void setUp() throws Exception{
+		this.buyorder = new LimitBuyOrder()
+	}
+}
